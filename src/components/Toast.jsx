@@ -3,8 +3,8 @@ import { Bell, CheckCircle, Info } from 'lucide-react';
 
 export const Toast = ({ message, type = 'info', onDismiss }) => {
   const Icon = type === 'success' ? CheckCircle : type === 'notification' ? Bell : Info;
-  const color = type === 'success' ? 'text-[#00FFAA]' : type === 'notification' ? 'text-purple-400' : 'text-blue-400';
-  const bgColor = type === 'success' ? 'bg-[#00FFAA]/10' : type === 'notification' ? 'bg-purple-500/10' : 'bg-blue-500/10';
+  const color = type === 'success' ? 'text-accent' : type === 'notification' ? 'text-purple-400' : 'text-blue-400';
+  const bgColor = type === 'success' ? 'bg-accent/10' : type === 'notification' ? 'bg-purple-500/10' : 'bg-blue-500/10';
 
   return (
     <div className="absolute top-4 left-0 right-0 flex justify-center z-[300] pointer-events-none px-4">

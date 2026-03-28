@@ -125,17 +125,17 @@ export const Budget = ({ direction }) => {
               initial={{ width: 0 }}
               animate={{ width: `${budgetPercent}%` }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className={`h-full rounded-full ${budgetPercent > 90 ? 'bg-red-500' : budgetPercent > 70 ? 'bg-orange-500' : 'bg-[#00FFAA]'}`}
+              className={`h-full rounded-full ${budgetPercent > 90 ? 'bg-red-500' : budgetPercent > 70 ? 'bg-orange-500' : 'bg-accent'}`}
             />
           </div>
         </div>
 
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${budgetPercent > 90 ? 'bg-red-500' : 'bg-[#00FFAA]'}`}></div>
+            <div className={`w-2 h-2 rounded-full ${budgetPercent > 90 ? 'bg-red-500' : 'bg-accent'}`}></div>
             <span className="text-[10px] text-white/50">{t('budget_spent')}: €{monthSpent.toFixed(0)}</span>
           </div>
-          <span className={`text-[10px] font-medium ${remaining >= 0 ? 'text-[#00FFAA]' : 'text-red-400'}`}>
+          <span className={`text-[10px] font-medium ${remaining >= 0 ? 'text-accent' : 'text-red-400'}`}>
             {t('budget_remaining')}: €{remaining.toFixed(0)}
           </span>
         </div>
@@ -149,7 +149,7 @@ export const Budget = ({ direction }) => {
       >
         <div className="flex justify-between items-end mb-3 px-1">
           <h3 className="text-[10px] font-semibold tracking-[0.2em] text-white/60 uppercase">{t('budget_subscriptions')}</h3>
-          <button onClick={() => setShowAddModal(true)} className="text-[10px] font-medium text-[#00FFAA] uppercase tracking-widest hover:brightness-125 transition-all outline-none flex items-center gap-1">
+          <button onClick={() => setShowAddModal(true)} className="text-[10px] font-medium text-accent uppercase tracking-widest hover:brightness-125 transition-all outline-none flex items-center gap-1">
             <Plus size={12} /> {t('budget_add_sub')}
           </button>
         </div>
@@ -238,7 +238,7 @@ export const Budget = ({ direction }) => {
                   value={newSub.name}
                   onChange={(e) => setNewSub({...newSub, name: e.target.value})}
                   placeholder="Ex: Netflix, Spotify, Disney+..."
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#00FFAA]/50 transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-accent/50 transition-colors"
                 />
               </div>
 
@@ -250,7 +250,7 @@ export const Budget = ({ direction }) => {
                   value={newSub.amount}
                   onChange={(e) => setNewSub({...newSub, amount: e.target.value})}
                   placeholder="9.99"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#00FFAA]/50 transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-accent/50 transition-colors"
                 />
               </div>
 
@@ -264,7 +264,7 @@ export const Budget = ({ direction }) => {
                       <button
                         key={ic.name}
                         onClick={() => setNewSub({...newSub, icon: ic.name})}
-                        className={`p-2.5 rounded-xl border transition-all ${newSub.icon === ic.name ? 'border-[#00FFAA] bg-[#00FFAA]/10' : 'border-white/10 bg-white/5'}`}
+                        className={`p-2.5 rounded-xl border transition-all ${newSub.icon === ic.name ? 'border-accent bg-accent/10' : 'border-white/10 bg-white/5'}`}
                       >
                         <Ic size={16} className="text-white/70" />
                       </button>
@@ -293,7 +293,7 @@ export const Budget = ({ direction }) => {
               <button onClick={() => setShowAddModal(false)} className="flex-1 py-3 rounded-xl border border-white/10 text-white/60 text-sm font-medium active:scale-95 transition-all">
                 {t('cancel')}
               </button>
-              <button onClick={handleAddSub} className="flex-1 py-3 rounded-xl bg-[#00FFAA] text-obsidian text-sm font-bold active:scale-95 transition-all shadow-[0_0_20px_rgba(0,255,170,0.3)]">
+              <button onClick={handleAddSub} className="flex-1 py-3 rounded-xl bg-accent text-obsidian text-sm font-bold active:scale-95 transition-all shadow-[0_0_20px_color-mix(in srgb, var(--color-accent) 30%, transparent)]">
                 {t('confirm')}
               </button>
             </div>
@@ -323,13 +323,13 @@ export const Budget = ({ direction }) => {
               value={budgetInput}
               onChange={(e) => setBudgetInput(e.target.value)}
               placeholder="1500"
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#00FFAA]/50 transition-colors mb-4"
+              className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-accent/50 transition-colors mb-4"
             />
             <div className="flex gap-3">
               <button onClick={() => setShowBudgetModal(false)} className="flex-1 py-3 rounded-xl border border-white/10 text-white/60 text-sm font-medium active:scale-95 transition-all">
                 {t('cancel')}
               </button>
-              <button onClick={handleSetBudget} className="flex-1 py-3 rounded-xl bg-[#00FFAA] text-obsidian text-sm font-bold active:scale-95 transition-all shadow-[0_0_20px_rgba(0,255,170,0.3)]">
+              <button onClick={handleSetBudget} className="flex-1 py-3 rounded-xl bg-accent text-obsidian text-sm font-bold active:scale-95 transition-all shadow-[0_0_20px_color-mix(in srgb, var(--color-accent) 30%, transparent)]">
                 {t('save')}
               </button>
             </div>

@@ -109,7 +109,7 @@ export const Analytics = ({ direction }) => {
         <button 
           onClick={() => setFilterAccountId(null)}
           className={`px-3 py-1.5 rounded-full text-[10px] font-semibold transition-all whitespace-nowrap ${
-            !filterAccountId ? 'bg-[#00FFAA]/20 text-[#00FFAA] border border-[#00FFAA]/30' : 'bg-white/5 text-white/50 border border-white/10'
+            !filterAccountId ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-white/5 text-white/50 border border-white/10'
           }`}
         >
           {t('dash_all')}
@@ -119,7 +119,7 @@ export const Analytics = ({ direction }) => {
             key={acc.id}
             onClick={() => setFilterAccountId(filterAccountId === acc.id ? null : acc.id)}
             className={`px-3 py-1.5 rounded-full text-[10px] font-semibold transition-all whitespace-nowrap ${
-              filterAccountId === acc.id ? 'bg-[#00FFAA]/20 text-[#00FFAA] border border-[#00FFAA]/30' : 'bg-white/5 text-white/50 border border-white/10'
+              filterAccountId === acc.id ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-white/5 text-white/50 border border-white/10'
             }`}
           >
             {acc.name}
@@ -135,22 +135,85 @@ export const Analytics = ({ direction }) => {
           <p className="text-sm font-bold text-red-400">€{totalSpent.toFixed(0)}</p>
         </div>
         <div className="glass-panel p-3 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
-          <TrendingUp size={14} className="text-[#00FFAA] mx-auto mb-1" />
+          <TrendingUp size={14} className="text-accent mx-auto mb-1" />
           <p className="text-[8px] text-white/40 uppercase tracking-wider mb-0.5">{t('stats_income')}</p>
-          <p className="text-sm font-bold text-[#00FFAA]">€{totalIncome.toFixed(0)}</p>
+          <p className="text-sm font-bold text-accent">€{totalIncome.toFixed(0)}</p>
         </div>
         <div className="glass-panel p-3 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
           <Wallet size={14} className="text-white/60 mx-auto mb-1" />
           <p className="text-[8px] text-white/40 uppercase tracking-wider mb-0.5">{t('stats_balance')}</p>
-          <p className={`text-sm font-bold ${balance >= 0 ? 'text-[#00FFAA]' : 'text-red-400'}`}>
+          <p className={`text-sm font-bold ${balance >= 0 ? 'text-accent' : 'text-red-400'}`}>
             {balance >= 0 ? '+' : ''}€{balance.toFixed(0)}
           </p>
         </div>
       </div>
+      
+      {/* ═══ FIXED STATS ═══ */}
+      {!isEmpty && (
+        <div className="mt-4">
+          <div className="flex gap-4 items-center">
+            {/* Donut chart */}
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.15, duration: 0.4 }}
+              className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center group"
+            >
+              <div className="absolute inset-1.5 rounded-full border border-white/5 bg-white/[0.01] backdrop-blur-3xl shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]"></div>
+              
+              <svg className="w-full h-full transform -rotate-90 relative z-10 drop-shadow-2xl" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="8" />
+                {donutSegments.map((seg, i) => (
+                  <motion.circle
+                    key={seg.name}
+                    cx="50" cy="50" r="42"
+                    fill="none"
+                    stroke={seg.color}
+                    strokeWidth="8"
+                    strokeDasharray={`${seg.length} ${2 * Math.PI * 42 - seg.length}`}
+                    strokeDashoffset={-seg.offset}
+                    strokeLinecap="round"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 + i * 0.1 }}
+                  />
+                ))}
+              </svg>
+              
+              <div className="absolute flex flex-col items-center justify-center w-full h-full">
+                <div className="w-16 h-16 rounded-full bg-obsidian/40 backdrop-blur-xl border border-white/10 flex flex-col items-center justify-center shadow-xl">
+                   <p className="text-[6px] font-semibold tracking-[0.25em] text-white/50 mb-0.5">{t('stats_budget')}</p>
+                   <p className="text-xl font-light text-white">{budgetPercent}<span className="text-xs text-white/40">%</span></p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Extra stats */}
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="glass-panel p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <p className="text-[8px] text-white/40 uppercase tracking-wider mb-0.5">{t('stats_daily_avg')}</p>
+                <p className="text-base font-bold text-white">€{dailyAvg.toFixed(0)}</p>
+              </div>
+              {topExpense && (
+                <div className="glass-panel p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
+                  <p className="text-[8px] text-white/40 uppercase tracking-wider mb-0.5">{t('stats_top_expense')}</p>
+                  <p className="text-xs font-bold text-red-400 truncate w-24">{topExpense.title}</p>
+                  <p className="text-[9px] text-white/40">{Math.abs(topExpense.amount).toFixed(2)}€</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Categories header */}
+      <div className="flex justify-between items-end mt-4 mb-2">
+        <h3 className="text-[10px] font-semibold tracking-[0.15em] text-white/60 uppercase">{t('stats_categories')}</h3>
+      </div>
     </div>
 
     {/* ═══ SCROLLABLE CONTENT ═══ */}
-    <div className="flex-1 overflow-y-auto scrollbar-hide px-6 pb-36">
+    <div className="flex-1 overflow-y-auto scrollbar-hide px-6 pb-24">
       {isEmpty ? (
         <div className="glass-panel p-10 text-center bg-white/[0.02] border border-white/5 rounded-2xl mt-4">
           <TrendingDown size={36} className="text-white/10 mx-auto mb-3" />
@@ -158,62 +221,6 @@ export const Analytics = ({ direction }) => {
         </div>
       ) : (
         <>
-          {/* Donut chart */}
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.15, duration: 0.4 }}
-            className="relative w-40 h-40 mx-auto mb-4 flex items-center justify-center group"
-          >
-            <div className="absolute inset-2 rounded-full border border-white/5 bg-white/[0.01] backdrop-blur-3xl shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]"></div>
-            
-            <svg className="w-full h-full transform -rotate-90 relative z-10 drop-shadow-2xl" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="8" />
-              {donutSegments.map((seg, i) => (
-                <motion.circle
-                  key={seg.name}
-                  cx="50" cy="50" r="42"
-                  fill="none"
-                  stroke={seg.color}
-                  strokeWidth="8"
-                  strokeDasharray={`${seg.length} ${2 * Math.PI * 42 - seg.length}`}
-                  strokeDashoffset={-seg.offset}
-                  strokeLinecap="round"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 + i * 0.1 }}
-                />
-              ))}
-            </svg>
-            
-            <div className="absolute flex flex-col items-center justify-center w-full h-full">
-              <div className="w-20 h-20 rounded-full bg-obsidian/40 backdrop-blur-xl border border-white/10 flex flex-col items-center justify-center shadow-xl">
-                 <p className="text-[7px] font-semibold tracking-[0.25em] text-white/50 mb-0.5">{t('stats_budget')}</p>
-                 <p className="text-2xl font-light text-white">{budgetPercent}<span className="text-sm text-white/40">%</span></p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Extra stats */}
-          <div className="flex gap-2 mb-4">
-            <div className="flex-1 glass-panel p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
-              <p className="text-[8px] text-white/40 uppercase tracking-wider mb-1">{t('stats_daily_avg')}</p>
-              <p className="text-lg font-bold text-white">€{dailyAvg.toFixed(0)}</p>
-            </div>
-            {topExpense && (
-              <div className="flex-1 glass-panel p-3 bg-white/[0.02] border border-white/5 rounded-2xl">
-                <p className="text-[8px] text-white/40 uppercase tracking-wider mb-1">{t('stats_top_expense')}</p>
-                <p className="text-sm font-bold text-red-400 truncate">{topExpense.title}</p>
-                <p className="text-[10px] text-white/40">{Math.abs(topExpense.amount).toFixed(2)}€</p>
-              </div>
-            )}
-          </div>
-
-          {/* Categories header */}
-          <div className="flex justify-between items-end mb-3 px-1">
-            <h3 className="text-[10px] font-semibold tracking-[0.15em] text-white/60 uppercase">{t('stats_categories')}</h3>
-          </div>
-
           {/* Category list */}
           <div className="flex flex-col gap-2">
             {categoryTotals.length === 0 && (
@@ -292,7 +299,7 @@ export const Analytics = ({ direction }) => {
                    <button 
                      key={`${year}-${month}`}
                      onClick={() => { setSelectedYear(year); setSelectedMonth(month); setShowDatePicker(false); }}
-                     className={`p-3 rounded-xl border flex items-center justify-center transition-all ${isSelected ? 'border-[#00FFAA] bg-[#00FFAA]/10 text-[#00FFAA]' : 'border-white/5 bg-white/5 text-white/70 hover:bg-white/10'}`}
+                     className={`p-3 rounded-xl border flex items-center justify-center transition-all ${isSelected ? 'border-accent bg-accent/10 text-accent' : 'border-white/5 bg-white/5 text-white/70 hover:bg-white/10'}`}
                    >
                      <span className="text-xs font-semibold">{t(`month_${month}`)} {year}</span>
                    </button>

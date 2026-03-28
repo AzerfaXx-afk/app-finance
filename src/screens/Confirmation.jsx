@@ -33,7 +33,7 @@ export const Confirmation = ({ direction }) => {
           className="w-24 h-24 rounded-full bg-accent/20 flex items-center justify-center mb-6 relative"
         >
           <div className="absolute inset-0 border border-accent/40 rounded-full animate-ping opacity-30" style={{ animationDuration: '2s' }}></div>
-          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center shadow-[0_0_40px_rgba(0,255,170,0.6)]">
+          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center shadow-[0_0_40px_color-mix(in srgb, var(--color-accent) 60%, transparent)]">
             <Check size={36} strokeWidth={3.5} className="text-obsidian" />
           </div>
         </motion.div>

@@ -183,7 +183,7 @@ export function getTotalIncome(transactions) {
 
 // ─── Categories ───
 export const CATEGORIES = [
-  { name: 'Alimentation', icon: 'ShoppingCart', color: '#00FFAA' },
+  { name: 'Alimentation', icon: 'ShoppingCart', color: 'var(--color-accent)' },
   { name: 'Transport', icon: 'Car', color: '#8B5CF6' },
   { name: 'Restaurants', icon: 'Coffee', color: '#F97316' },
   { name: 'Loisirs', icon: 'Gamepad2', color: '#EC4899' },

@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-accent: #00FFAA;
+}
+
 @layer utilities {
   .glass-panel {
     @apply bg-glass border border-glassBorder rounded-[2.5rem] backdrop-blur-[24px] shadow-2xl;

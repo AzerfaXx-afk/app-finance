@@ -18,7 +18,7 @@ const Toggle = ({ enabled, setEnabled, onChange }) => (
       setEnabled(newVal);
       if(onChange) onChange(newVal);
     }}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${enabled ? 'bg-[#00FFAA]' : 'bg-white/10'}`}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${enabled ? 'bg-accent' : 'bg-white/10'}`}
   >
     <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
   </button>
@@ -50,7 +50,7 @@ export const Profile = ({ direction }) => {
   const themes = getThemeNames();
 
   const themeColors = [
-    { bg: 'bg-gradient-to-br from-emerald-900/50 to-black', accent: '#00FFAA' },
+    { bg: 'bg-gradient-to-br from-emerald-900/50 to-black', accent: 'var(--color-accent)' },
     { bg: 'bg-black', accent: '#FFFFFF' },
     { bg: 'bg-gradient-to-br from-orange-900/50 to-black', accent: '#F97316' },
     { bg: 'bg-gradient-to-br from-indigo-900/50 to-black', accent: '#818CF8' },
@@ -72,7 +72,7 @@ export const Profile = ({ direction }) => {
   }, []);
 
   const streakProgress = Math.min((streakDays / 100) * 100, 100);
-  const streakColor = streakDays > 50 ? '#00FFAA' : (streakDays > 10 ? '#F97316' : '#EF4444');
+  const streakColor = streakDays > 50 ? 'var(--color-accent)' : (streakDays > 10 ? '#F97316' : '#EF4444');
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -237,7 +237,7 @@ export const Profile = ({ direction }) => {
             <div className="absolute top-0 w-full h-1/2 bg-gradient-to-b from-indigo/10 to-transparent pointer-events-none rounded-t-3xl"></div>
             
             <div className="relative mb-4 group cursor-pointer" onClick={() => setShowAvatarModal(true)}>
-              <div className="w-24 h-24 rounded-full p-[2px] shadow-[0_0_25px_rgba(0,255,170,0.15)] bg-gradient-to-tr from-[#00FFAA] via-[#8B5CF6] to-[#F97316]">
+              <div className="w-24 h-24 rounded-full p-[2px] shadow-[0_0_25px_color-mix(in srgb, var(--color-accent) 15%, transparent)] bg-gradient-to-tr from-[var(--color-accent)] via-[#8B5CF6] to-[#F97316]">
                 <div className="w-full h-full rounded-full bg-obsidian overflow-hidden border-2 border-obsidian relative flex items-center justify-center">
                    {profile.avatarUrl ? (
                       <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
@@ -365,7 +365,7 @@ export const Profile = ({ direction }) => {
               </div>
               <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-9 h-9 rounded-xl bg-[#00FFAA]/10 flex items-center justify-center text-[#00FFAA] border border-[#00FFAA]/10">
+                    <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent border border-accent/10">
                       <Fingerprint size={18} />
                     </div>
                     <div className="flex flex-col">
@@ -471,7 +471,7 @@ export const Profile = ({ direction }) => {
                    placeholder={t('profile_search_lang')}
                    value={searchQuery}
                    onChange={(e) => setSearchQuery(e.target.value)}
-                   className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white placeholder-white/40 outline-none focus:border-[#00FFAA]/50 transition-colors"
+                   className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm text-white placeholder-white/40 outline-none focus:border-accent/50 transition-colors"
                  />
                </div>
              </div>
@@ -491,7 +491,7 @@ export const Profile = ({ direction }) => {
                            <span className="text-xl">{lang.flag}</span>
                            <span className={`text-sm ${isSelected ? 'font-semibold text-white' : 'font-medium text-white/80'}`}>{lang.name}</span>
                          </div>
-                         {isSelected && <div className="w-2 h-2 rounded-full bg-[#00FFAA] shadow-[0_0_8px_rgba(0,255,170,0.8)]"></div>}
+                         {isSelected && <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_color-mix(in srgb, var(--color-accent) 80%, transparent)]"></div>}
                        </button>
                      );
                    })}
@@ -631,11 +631,11 @@ export const Profile = ({ direction }) => {
                     key={i} 
                     animate={{ 
                       scale: pinInput.length > i ? [1, 1.2, 1] : 1, 
-                      backgroundColor: pinInput.length > i ? '#00FFAA' : 'rgba(255,255,255,0.1)' 
+                      backgroundColor: pinInput.length > i ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)' 
                     }}
                     transition={{ duration: 0.2 }}
                     className="w-3.5 h-3.5 rounded-full"
-                    style={{ boxShadow: pinInput.length > i ? '0 0 15px rgba(0,255,170,0.6)' : 'none' }}
+                    style={{ boxShadow: pinInput.length > i ? '0 0 15px color-mix(in srgb, var(--color-accent) 60%, transparent)' : 'none' }}
                   />
                 ))}
               </div>

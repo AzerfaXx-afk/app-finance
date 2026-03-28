@@ -93,7 +93,7 @@ export const Scanner = ({ direction }) => {
           </button>
           <button 
             onClick={() => setType('income')}
-            className={`flex-1 py-2.5 rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${type === 'income' ? 'bg-[#00FFAA]/20 text-[#00FFAA] shadow-md' : 'text-white/40'}`}
+            className={`flex-1 py-2.5 rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${type === 'income' ? 'bg-accent/20 text-accent shadow-md' : 'text-white/40'}`}
           >
             <Plus size={14} /> {t('scan_income')}
           </button>
@@ -103,7 +103,7 @@ export const Scanner = ({ direction }) => {
       {/* Amount */}
       <div className="shrink-0 flex flex-col items-center px-6 mt-5 mb-3">
         <h2 className="text-4xl font-light tracking-tight glow-text flex items-start">
-          <span className={`text-xl mt-1.5 mr-1 ${type === 'expense' ? 'text-red-400' : 'text-[#00FFAA]'}`}>€</span>
+          <span className={`text-xl mt-1.5 mr-1 ${type === 'expense' ? 'text-red-400' : 'text-accent'}`}>€</span>
           {amount || '0.00'}
         </h2>
       </div>
@@ -115,7 +115,7 @@ export const Scanner = ({ direction }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t('scan_name')}
-          className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#00FFAA]/50 transition-colors"
+          className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-accent/50 transition-colors"
         />
 
         <div className="flex gap-2.5">
@@ -144,7 +144,7 @@ export const Scanner = ({ direction }) => {
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm text-white outline-none focus:border-[#00FFAA]/50 transition-colors [color-scheme:dark]"
+          className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm text-white outline-none focus:border-accent/50 transition-colors [color-scheme:dark]"
         />
       </div>
 
@@ -164,10 +164,10 @@ export const Scanner = ({ direction }) => {
           </div>
           <button 
             onClick={handleConfirm}
-            className={`w-full py-4 rounded-2xl text-white font-semibold text-xs tracking-widest shadow-[0_0_20px_rgba(0,255,170,0.15)] active:scale-95 transition-all ${
+            className={`w-full py-4 rounded-2xl text-white font-semibold text-xs tracking-widest shadow-[0_0_20px_color-mix(in srgb, var(--color-accent) 15%, transparent)] active:scale-95 transition-all ${
               type === 'expense' 
                 ? 'bg-gradient-to-r from-red-600 to-orange-500'
-                : 'bg-gradient-to-r from-[#00FFAA]/80 to-[#8B5CF6]/80'
+                : 'bg-gradient-to-r from-[var(--color-accent)]/80 to-[#8B5CF6]/80'
             }`}
           >
             {t('scan_confirm')}
@@ -192,7 +192,7 @@ export const Scanner = ({ direction }) => {
                   <button
                     key={cat.name}
                     onClick={() => { setCategory(cat.name); setShowCategoryPicker(false); }}
-                    className={`p-3 rounded-xl border flex items-center gap-2 transition-all ${category === cat.name ? 'border-[#00FFAA] bg-[#00FFAA]/10' : 'border-white/5 bg-white/5 hover:bg-white/10'}`}
+                    className={`p-3 rounded-xl border flex items-center gap-2 transition-all ${category === cat.name ? 'border-accent bg-accent/10' : 'border-white/5 bg-white/5 hover:bg-white/10'}`}
                   >
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: cat.color + '20' }}>
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }}></div>
@@ -228,7 +228,7 @@ export const Scanner = ({ direction }) => {
                   <button
                     key={acc.id}
                     onClick={() => { setAccountId(acc.id); setShowAccountPicker(false); }}
-                    className={`p-4 rounded-xl border flex items-center justify-between transition-all ${accountId === acc.id ? 'border-[#00FFAA] bg-[#00FFAA]/10' : 'border-white/5 bg-white/5 hover:bg-white/10'}`}
+                    className={`p-4 rounded-xl border flex items-center justify-between transition-all ${accountId === acc.id ? 'border-accent bg-accent/10' : 'border-white/5 bg-white/5 hover:bg-white/10'}`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${acc.color} flex items-center justify-center text-white font-bold text-sm`}>
@@ -239,7 +239,7 @@ export const Scanner = ({ direction }) => {
                         <p className="text-[10px] text-white/40">{acc.type} • €{acc.balance.toFixed(2)}</p>
                       </div>
                     </div>
-                    {accountId === acc.id && <div className="w-2 h-2 rounded-full bg-[#00FFAA] shadow-[0_0_8px_rgba(0,255,170,0.8)]"></div>}
+                    {accountId === acc.id && <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_color-mix(in srgb, var(--color-accent) 80%, transparent)]"></div>}
                   </button>
                 ))}
               </div>

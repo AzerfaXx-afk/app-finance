@@ -35,7 +35,7 @@ function getRelativeDate(dateStr) {
 }
 
 export const Dashboard = ({ direction, deferredPrompt }) => {
-  const { navTo, showToast, refreshData, refreshKey } = useApp();
+  const { navTo, showToast, refreshData, refreshKey, swUpdate, applyUpdate } = useApp();
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [filterAccountId, setFilterAccountId] = useState(null);
@@ -44,10 +44,45 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
   const [isStandalone, setIsStandalone] = useState(false);
   const [installDismissed, setInstallDismissed] = useState(() => sessionStorage.getItem('install_dismissed') === '1');
 
+  // Pull to refresh state
+  const scrollRef = useRef(null);
+  const startY = useRef(0);
+  const [pullY, setPullY] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   useEffect(() => {
     setAccounts(getAccounts());
     setTransactions(getTransactions());
   }, [refreshKey]);
+
+  const handleTouchStart = (e) => {
+    if (scrollRef.current && scrollRef.current.scrollTop > 0) return;
+    startY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e) => {
+    if (isRefreshing || startY.current === 0) return;
+    if (scrollRef.current && scrollRef.current.scrollTop > 0) return;
+    const y = e.touches[0].clientY;
+    const diff = y - startY.current;
+    if (diff > 0) {
+      setPullY(Math.min(diff * 0.4, 80));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pullY > 60 && !isRefreshing) {
+      setIsRefreshing(true);
+      refreshData();
+      setTimeout(() => {
+        setIsRefreshing(false);
+        setPullY(0);
+      }, 1200);
+    } else {
+      setPullY(0);
+    }
+    startY.current = 0;
+  };
 
   useEffect(() => {
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
@@ -106,20 +141,41 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
     animate="animate"
     exit="exit"
     className="flex flex-col h-full absolute inset-0 z-10 overflow-hidden"
+    onTouchStart={handleTouchStart}
+    onTouchMove={handleTouchMove}
+    onTouchEnd={handleTouchEnd}
   >
+    {/* Pull to refresh indicator */}
+    <div 
+      className="absolute top-0 left-0 right-0 flex justify-center items-center pointer-events-none z-50 overflow-visible"
+      style={{ height: pullY > 0 || isRefreshing ? 60 : 0, opacity: pullY / 60 }}
+    >
+       <motion.div 
+         animate={{ rotate: isRefreshing ? 360 : pullY * 2 }}
+         transition={{ repeat: isRefreshing ? Infinity : 0, ease: "linear", duration: 1 }}
+         className="w-8 h-8 rounded-[12px] bg-obsidian overflow-hidden p-[1px] bg-gradient-to-tr from-[var(--color-accent)] via-[#8B5CF6] to-[#F97316] shadow-[0_0_15px_var(--color-accent)] mt-8"
+       >
+         <img src="/fluid-icon.png" alt="Refreshing" className="w-full h-full object-cover rounded-[11px]" />
+       </motion.div>
+    </div>
+
     {/* ═══ FIXED HEADER ZONE ═══ */}
-    <div className="flex-shrink-0 px-6 pt-6">
+    <motion.div 
+      className="flex-shrink-0 px-6 pt-6 relative"
+      animate={{ y: isRefreshing ? 20 : pullY * 0.5 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
       {/* Header */}
       <header className="flex justify-between items-center mb-5 mt-2">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[12px] shadow-[0_0_15px_rgba(0,255,170,0.3)] bg-obsidian overflow-hidden border-none shrink-0 bg-gradient-to-tr from-[#00FFAA] via-[#8B5CF6] to-[#F97316] p-[1px]">
+          <div className="w-8 h-8 rounded-[12px] shadow-[0_0_15px_color-mix(in srgb, var(--color-accent) 30%, transparent)] bg-obsidian overflow-hidden border-none shrink-0 bg-gradient-to-tr from-[var(--color-accent)] via-[#8B5CF6] to-[#F97316] p-[1px]">
              <img src="/fluid-icon.png" alt="Fluid Logo" className="w-full h-full object-cover rounded-[11px]" />
           </div>
           <h1 className="text-sm font-semibold tracking-[0.3em] text-white">FLUID</h1>
         </div>
         <button onClick={() => navTo('profile')} className="w-10 h-10 rounded-full glass-panel flex justify-center items-center bg-white/5 relative hover:bg-white/10 transition-colors">
           <UserIcon size={18} className="text-white/80" />
-          <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#00FFAA] shadow-[0_0_5px_rgba(0,255,170,0.8)]"></div>
+          <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent shadow-[0_0_5px_color-mix(in srgb, var(--color-accent) 80%, transparent)]"></div>
         </button>
       </header>
 
@@ -130,7 +186,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
         transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="flex flex-col items-center mb-5 relative"
       >
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#00FFAA]/5 via-[#8B5CF6]/5 to-transparent blur-[60px] rounded-full w-64 h-64 mx-auto top-[-40px] z-0 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-accent)]/5 via-[#8B5CF6]/5 to-transparent blur-[60px] rounded-full w-64 h-64 mx-auto top-[-40px] z-0 pointer-events-none"></div>
         
         <div className="glass-panel px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/10 mb-3 flex items-center gap-2 relative z-10">
            <span className="w-2 h-2 rounded-full bg-white/20"></span>
@@ -155,14 +211,14 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
       >
         <div className="flex justify-between items-end mb-3 px-1">
           <h3 className="text-[10px] font-semibold tracking-[0.2em] text-white/60 uppercase">{t('dash_your_banks')}</h3>
-          <button onClick={() => setShowAddAccount(true)} className="text-[10px] font-medium text-[#00FFAA] uppercase tracking-widest hover:brightness-125 transition-all outline-none flex items-center gap-1">
+          <button onClick={() => setShowAddAccount(true)} className="text-[10px] font-medium text-accent uppercase tracking-widest hover:brightness-125 transition-all outline-none flex items-center gap-1">
             <Plus size={12} /> {t('dash_add_bank')}
           </button>
         </div>
         
         <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 snap-x">
           {isEmpty && (
-            <button onClick={() => setShowAddAccount(true)} className="flex flex-col justify-center items-center flex-shrink-0 w-36 h-36 p-4 rounded-3xl border-2 border-dashed border-white/10 text-white/30 hover:border-[#00FFAA]/30 hover:text-[#00FFAA]/50 transition-all snap-center">
+            <button onClick={() => setShowAddAccount(true)} className="flex flex-col justify-center items-center flex-shrink-0 w-36 h-36 p-4 rounded-3xl border-2 border-dashed border-white/10 text-white/30 hover:border-accent/30 hover:text-accent/50 transition-all snap-center">
               <Banknote size={28} className="mb-2" />
               <span className="text-[10px] font-medium text-center">{t('dash_no_accounts')}</span>
             </button>
@@ -199,7 +255,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
         {/* Filter indicator */}
         {filterAccountId && (
           <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mt-2 flex items-center justify-center gap-2">
-            <span className="text-[10px] text-[#00FFAA] font-medium">
+            <span className="text-[10px] text-accent font-medium">
               {accounts.find(a => a.id === filterAccountId)?.name}
             </span>
             <button onClick={() => setFilterAccountId(null)} className="text-white/40 hover:text-white">
@@ -213,13 +269,13 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
       <div className="flex justify-between items-end mb-3 px-1">
         <h3 className="text-[10px] font-semibold tracking-[0.2em] text-white/60 uppercase">{t('dash_transactions')}</h3>
         {transactions.length > 0 && (
-          <button onClick={() => navTo('analytics')} className="text-[10px] font-medium text-[#00FFAA] uppercase tracking-widest hover:brightness-125 transition-all outline-none">{t('dash_analyze')}</button>
+          <button onClick={() => navTo('analytics')} className="text-[10px] font-medium text-accent uppercase tracking-widest hover:brightness-125 transition-all outline-none">{t('dash_analyze')}</button>
         )}
       </div>
-    </div>
+    </motion.div>
 
     {/* ═══ SCROLLABLE TRANSACTIONS ZONE ═══ */}
-    <div className="flex-1 overflow-y-auto scrollbar-hide px-6 pb-36">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-hide px-6 pb-36">
       <div className="flex flex-col gap-2">
          {sortedTransactions.length === 0 && (
            <div className="glass-panel p-8 text-center bg-white/[0.02] border border-white/5 rounded-2xl">
@@ -242,7 +298,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
                >
                   <div className="flex items-center gap-3 relative z-10 w-full">
                      <div className={`relative w-10 h-10 rounded-2xl flex items-center justify-center bg-black/40 border ${account?.borderColor || 'border-white/10'} shadow-inner shrink-0`}>
-                         <Icon size={16} className={isPositive ? 'text-[#00FFAA]' : 'text-white/70'} />
+                         <Icon size={16} className={isPositive ? 'text-accent' : 'text-white/70'} />
                          {account && (
                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gradient-to-br ${account.color} border-2 border-obsidian flex items-center justify-center text-[5px] font-bold text-white`}>
                               {account.shortName}
@@ -253,7 +309,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
                      <div className="flex-1 min-w-0">
                          <div className="flex justify-between items-center">
                             <span className="text-sm font-medium tracking-wide text-white/90 truncate">{tx.title}</span>
-                            <span className={`text-sm font-bold ml-2 shrink-0 ${isPositive ? 'text-[#00FFAA]' : 'text-white'}`}>
+                            <span className={`text-sm font-bold ml-2 shrink-0 ${isPositive ? 'text-accent' : 'text-white'}`}>
                                {isPositive ? '+' : ''}{tx.amount.toFixed(2)}€
                             </span>
                          </div>
@@ -272,6 +328,33 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
          })}
       </div>
 
+      {/* SW Update prompt */}
+      <AnimatePresence>
+        {swUpdate && !installDismissed && (
+          <motion.div 
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed top-20 left-4 right-4 z-[60] glass-panel p-3 border border-blue-500/50 bg-blue-900/60 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-3xl"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-400/20 flex items-center justify-center text-blue-300 shrink-0">
+                <Download size={14} />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold text-white uppercase tracking-wider">Mise à jour dispo</p>
+                <p className="text-[9px] text-white/50">Applique la pour les nouveautés</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => applyUpdate()} className="px-3 py-1.5 bg-blue-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider active:scale-95 transition-all">
+                Actualiser
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Install prompt */}
       <AnimatePresence>
         {!isStandalone && deferredPrompt && !installDismissed && (
@@ -279,10 +362,10 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed top-4 left-4 right-4 z-[60] glass-panel p-3 border border-[#00FFAA]/30 bg-black/80 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-3xl"
+            className="fixed top-4 left-4 right-4 z-[60] glass-panel p-3 border border-accent/30 bg-black/80 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-3xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#00FFAA]/20 flex items-center justify-center text-[#00FFAA] shrink-0">
+              <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent shrink-0">
                 <Download size={14} />
               </div>
               <div>
@@ -290,7 +373,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={handleInstallClick} className="px-3 py-1.5 bg-[#00FFAA] text-obsidian text-[10px] font-bold rounded-lg uppercase tracking-wider active:scale-95 transition-all">
+              <button onClick={handleInstallClick} className="px-3 py-1.5 bg-accent text-obsidian text-[10px] font-bold rounded-lg uppercase tracking-wider active:scale-95 transition-all">
                 Installer
               </button>
               <button 
@@ -333,7 +416,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
                   value={newBank.name}
                   onChange={(e) => setNewBank({...newBank, name: e.target.value})}
                   placeholder="Ex: Boursorama, N26, Revolut..."
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#00FFAA]/50 transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-accent/50 transition-colors"
                 />
               </div>
               <div>
@@ -341,7 +424,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
                 <select 
                   value={newBank.type}
                   onChange={(e) => setNewBank({...newBank, type: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-[#00FFAA]/50 transition-colors appearance-none"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-accent/50 transition-colors appearance-none"
                 >
                   <option value="Compte Courant" className="bg-[#0A0A0C]">Compte Courant</option>
                   <option value="Livret A" className="bg-[#0A0A0C]">Livret A</option>
@@ -359,7 +442,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
                   value={newBank.balance}
                   onChange={(e) => setNewBank({...newBank, balance: e.target.value})}
                   placeholder="0.00"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#00FFAA]/50 transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-accent/50 transition-colors"
                 />
               </div>
             </div>
@@ -368,7 +451,7 @@ export const Dashboard = ({ direction, deferredPrompt }) => {
               <button onClick={() => setShowAddAccount(false)} className="flex-1 py-3 rounded-xl border border-white/10 text-white/60 text-sm font-medium active:scale-95 transition-all">
                 {t('add_account_cancel')}
               </button>
-              <button onClick={handleAddBank} className="flex-1 py-3 rounded-xl bg-[#00FFAA] text-obsidian text-sm font-bold active:scale-95 transition-all shadow-[0_0_20px_rgba(0,255,170,0.3)]">
+              <button onClick={handleAddBank} className="flex-1 py-3 rounded-xl bg-accent text-obsidian text-sm font-bold active:scale-95 transition-all shadow-[0_0_20px_color-mix(in srgb, var(--color-accent) 30%, transparent)]">
                 {t('add_account_save')}
               </button>
             </div>

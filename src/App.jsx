@@ -210,10 +210,10 @@ const AuthScreen = ({ onAuth, lang }) => {
       transition={{ duration: 0.4, ease: "easeInOut" }}
       className="absolute inset-0 z-[200] flex flex-col items-center justify-between py-16 px-6 backdrop-blur-3xl bg-obsidian/95"
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-[#00FFAA]/5 to-transparent pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-accent/5 to-transparent pointer-events-none"></div>
       
       <div className="flex flex-col items-center mt-6 relative z-10 w-full">
-        <div className="w-16 h-16 rounded-[20px] shadow-[0_0_30px_rgba(0,255,170,0.2)] mb-10 relative group overflow-hidden border border-white/10">
+        <div className="w-16 h-16 rounded-[20px] shadow-[0_0_30px_var(--color-accent)] mb-10 relative group overflow-hidden border border-white/10 opacity-80">
            <img src="/fluid-icon.png" alt="Fluid Logo" className="w-full h-full object-cover rounded-[20px]" />
         </div>
         
@@ -223,11 +223,11 @@ const AuthScreen = ({ onAuth, lang }) => {
               key={i} 
               animate={{ 
                 scale: pin.length > i ? [1, 1.2, 1] : 1, 
-                backgroundColor: pin.length > i ? '#00FFAA' : 'rgba(255,255,255,0.1)' 
+                backgroundColor: pin.length > i ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)' 
               }}
               transition={{ duration: 0.2 }}
               className="w-3.5 h-3.5 rounded-full"
-              style={{ boxShadow: pin.length > i ? '0 0 15px rgba(0,255,170,0.6)' : 'none' }}
+              style={{ boxShadow: pin.length > i ? '0 0 15px var(--color-accent)' : 'none' }}
             />
           ))}
         </div>
@@ -250,10 +250,10 @@ const AuthScreen = ({ onAuth, lang }) => {
         
         <button 
           onClick={handleBiometricAuth}
-          className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-[#00FFAA] hover:bg-[#00FFAA]/10 active:scale-95 transition-transform outline-none"
+          className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-accent hover:bg-accent/10 active:scale-95 transition-transform outline-none"
         >
           {scanning ? (
-             <ShieldCheck size={28} className="animate-pulse drop-shadow-[0_0_10px_rgba(0,255,170,0.8)]" />
+             <ShieldCheck size={28} className="animate-pulse drop-shadow-[0_0_10px_var(--color-accent)]" />
           ) : (
              <Fingerprint size={30} />
           )}
@@ -303,10 +303,49 @@ export default function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const [swUpdate, setSwUpdate] = useState(null);
+
   // Keep i18n in sync
   useEffect(() => {
     setLanguage(settings.language || 'fr');
   }, [settings.language]);
+
+  // Sync Global Theme Accent Color
+  useEffect(() => {
+    const accents = ['#00FFAA', '#14B8A6', '#F97316', '#818CF8', '#F43F5E'];
+    const accent = accents[settings.themeIndex % accents.length];
+    document.documentElement.style.setProperty('--color-accent', accent);
+    
+    // Also update meta theme-color for PWA
+    let metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (!metaTheme) {
+      metaTheme = document.createElement('meta');
+      metaTheme.name = 'theme-color';
+      document.head.appendChild(metaTheme);
+    }
+    metaTheme.content = '#0A0A0C';
+  }, [settings.themeIndex]);
+
+  // PWA Update Listener
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
+      navigator.serviceWorker.ready.then(reg => {
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                setSwUpdate(true);
+              }
+            });
+          }
+        });
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
@@ -428,6 +467,17 @@ export default function App() {
     navTo,
     refreshData,
     refreshKey,
+    swUpdate,
+    applyUpdate: () => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          if (reg && reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          else window.location.reload();
+        });
+      } else {
+        window.location.reload();
+      }
+    },
     t,
   };
 
