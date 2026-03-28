@@ -90,7 +90,7 @@ export const Budget = ({ direction }) => {
     initial="initial"
     animate="animate"
     exit="exit"
-    className="flex flex-col h-full p-6 absolute inset-0 z-10 overflow-hidden pb-20"
+    className="flex flex-col h-full px-6 pt-6 absolute inset-0 z-10 overflow-hidden"
   >
     <header className="flex justify-between items-center mb-6 mt-4 shrink-0">
       <button onClick={() => navTo('dashboard')} className="w-10 h-10 rounded-full glass-panel flex justify-center items-center bg-white/5 active:scale-95 transition-all hover:bg-white/10">
@@ -100,7 +100,7 @@ export const Budget = ({ direction }) => {
       <div className="w-10 h-10"></div>
     </header>
 
-    <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pb-4">
+    <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pb-36">
       {/* Budget Overview Card */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}

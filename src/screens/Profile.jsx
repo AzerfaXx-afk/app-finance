@@ -440,8 +440,7 @@ export const Profile = ({ direction }) => {
             </button>
           </div>
           
-          <div className="text-center pb-6">
-            <p className="text-[10px] text-white/30 font-mono">{t('profile_version')}</p>
+          <div className="text-center pb-20">
           </div>
         </div>
       </motion.div>

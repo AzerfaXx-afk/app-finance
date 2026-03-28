@@ -7,7 +7,7 @@ import { t } from '../data/i18n';
 
 export const Scanner = ({ direction }) => {
   const { navTo, showToast, refreshData } = useApp();
-  const [type, setType] = useState('expense'); // expense or income
+  const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -29,7 +29,6 @@ export const Scanner = ({ direction }) => {
     } else if (key === '.') {
       if (!amount.includes('.')) setAmount(prev => prev + '.');
     } else {
-      // Limit decimals to 2
       const parts = amount.split('.');
       if (parts[1] && parts[1].length >= 2) return;
       setAmount(prev => prev + key);
@@ -39,15 +38,12 @@ export const Scanner = ({ direction }) => {
   const handleConfirm = () => {
     const numAmount = parseFloat(amount);
     if (!numAmount || numAmount <= 0) {
-      showToast('Entrez un montant valide', 'info');
+      showToast(t('scan_amount_error') || 'Montant invalide', 'info');
       return;
     }
     if (!accountId) {
       showToast(t('scan_select_account'), 'info');
       return;
-    }
-    if (!title.trim()) {
-      setTitle(category || 'Transaction');
     }
 
     const finalAmount = type === 'expense' ? -Math.abs(numAmount) : Math.abs(numAmount);
@@ -68,7 +64,6 @@ export const Scanner = ({ direction }) => {
   };
 
   const selectedAccount = accounts.find(a => a.id === accountId);
-  const selectedCategory = CATEGORIES.find(c => c.name === category);
 
   return (
     <motion.div 
@@ -76,9 +71,10 @@ export const Scanner = ({ direction }) => {
       animate={{ opacity: 1, y: 0 }} 
       exit={{ opacity: 0, y: "100%" }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col h-full absolute inset-0 z-20 backdrop-blur-xl bg-black/40"
+      className="flex flex-col h-full absolute inset-0 z-50 bg-[#0A0A0C]"
     >
-      <header className="flex justify-between items-center p-6 pt-10 relative z-20">
+      {/* Header */}
+      <header className="flex justify-between items-center px-6 pt-6 mt-2 shrink-0">
         <button onClick={() => navTo('dashboard')} className="w-10 h-10 rounded-full bg-white/5 flex justify-center items-center active:scale-95 transition-all border border-white/10">
           <ArrowLeft size={20} className="text-white" />
         </button>
@@ -87,7 +83,7 @@ export const Scanner = ({ direction }) => {
       </header>
 
       {/* Type Toggle */}
-      <div className="px-6 mb-4">
+      <div className="px-6 mt-4 shrink-0">
         <div className="glass-panel p-1 flex bg-white/5 border-white/10 rounded-full">
           <button 
             onClick={() => setType('expense')}
@@ -104,32 +100,28 @@ export const Scanner = ({ direction }) => {
         </div>
       </div>
 
-      {/* Amount Display */}
-      <div className="flex-shrink-0 flex flex-col items-center px-6 mb-4">
-        <div className="relative z-30 text-center flex flex-col items-center">
-          <h2 className="text-5xl font-light tracking-tight glow-text flex items-start">
-            <span className={`text-2xl mt-2 mr-1 ${type === 'expense' ? 'text-red-400' : 'text-[#00FFAA]'}`}>€</span>
-            {amount || '0.00'}
-          </h2>
-        </div>
+      {/* Amount */}
+      <div className="shrink-0 flex flex-col items-center px-6 mt-5 mb-3">
+        <h2 className="text-4xl font-light tracking-tight glow-text flex items-start">
+          <span className={`text-xl mt-1.5 mr-1 ${type === 'expense' ? 'text-red-400' : 'text-[#00FFAA]'}`}>€</span>
+          {amount || '0.00'}
+        </h2>
       </div>
 
       {/* Form Fields */}
-      <div className="px-6 flex flex-col gap-3 mb-4 flex-shrink-0">
-        {/* Title */}
+      <div className="px-6 flex flex-col gap-2.5 shrink-0">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t('scan_name')}
-          className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#00FFAA]/50 transition-colors"
+          className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm text-white placeholder-white/30 outline-none focus:border-[#00FFAA]/50 transition-colors"
         />
 
-        <div className="flex gap-3">
-          {/* Category picker */}
+        <div className="flex gap-2.5">
           <button 
             onClick={() => setShowCategoryPicker(true)}
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-left flex items-center justify-between"
+            className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm text-left flex items-center justify-between"
           >
             <span className={category ? 'text-white' : 'text-white/30'}>
               {category || t('scan_category')}
@@ -137,10 +129,9 @@ export const Scanner = ({ direction }) => {
             <ChevronDown size={14} className="text-white/30" />
           </button>
 
-          {/* Account picker */}
           <button 
             onClick={() => setShowAccountPicker(true)}
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-left flex items-center justify-between"
+            className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm text-left flex items-center justify-between"
           >
             <span className={accountId ? 'text-white' : 'text-white/30'}>
               {selectedAccount?.name || t('scan_account')}
@@ -149,38 +140,39 @@ export const Scanner = ({ direction }) => {
           </button>
         </div>
 
-        {/* Date */}
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-[#00FFAA]/50 transition-colors [color-scheme:dark]"
+          className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm text-white outline-none focus:border-[#00FFAA]/50 transition-colors [color-scheme:dark]"
         />
       </div>
 
-      {/* Numpad */}
-      <div className="flex-1 glass-panel rounded-t-[40px] rounded-b-none border-b-0 border-x-0 sticky bottom-0 z-40 p-6 flex flex-col justify-between backdrop-blur-3xl shadow-[0_-20px_40px_rgba(0,0,0,0.5)] bg-white/5">
-        <div className="grid grid-cols-3 gap-y-5 text-center text-2xl font-light mt-2">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 0, '⌫'].map((key, i) => (
-            <button 
-              key={i} 
-              onClick={() => handleKeyPress(key.toString())}
-              className="text-gray-200 active:text-white active:scale-95 transition-all py-2 outline-none"
-            >
-              {key}
-            </button>
-          ))}
+      {/* Numpad + Confirm — fills remaining space */}
+      <div className="flex-1 flex flex-col justify-end mt-3">
+        <div className="bg-white/[0.03] border-t border-white/10 rounded-t-[32px] px-6 pt-4 pb-32 flex flex-col">
+          <div className="grid grid-cols-3 gap-y-3 text-center text-xl font-light mb-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 0, '⌫'].map((key, i) => (
+              <button 
+                key={i} 
+                onClick={() => handleKeyPress(key.toString())}
+                className="text-gray-200 active:text-white active:scale-90 transition-all py-2 outline-none"
+              >
+                {key}
+              </button>
+            ))}
+          </div>
+          <button 
+            onClick={handleConfirm}
+            className={`w-full py-4 rounded-2xl text-white font-semibold text-xs tracking-widest shadow-[0_0_20px_rgba(0,255,170,0.15)] active:scale-95 transition-all ${
+              type === 'expense' 
+                ? 'bg-gradient-to-r from-red-600 to-orange-500'
+                : 'bg-gradient-to-r from-[#00FFAA]/80 to-[#8B5CF6]/80'
+            }`}
+          >
+            {t('scan_confirm')}
+          </button>
         </div>
-        <button 
-          onClick={handleConfirm}
-          className={`w-full py-4 mt-4 rounded-[1.25rem] text-white font-medium text-xs tracking-widest shadow-[0_0_20px_rgba(0,255,170,0.15)] active:scale-95 transition-all ${
-            type === 'expense' 
-              ? 'bg-gradient-to-r from-red-600 to-orange-500'
-              : 'bg-gradient-to-r from-[#00FFAA]/80 to-[#8B5CF6]/80'
-          }`}
-        >
-          {t('scan_confirm')}
-        </button>
       </div>
 
       {/* Category Picker Modal */}
@@ -193,7 +185,7 @@ export const Scanner = ({ direction }) => {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="absolute inset-0 z-50 backdrop-blur-2xl bg-black/60 flex flex-col justify-end"
           >
-            <div className="glass-panel w-full bg-obsidian/90 border-t border-white/10 p-6 rounded-t-3xl pb-10 max-h-[60vh] overflow-y-auto scrollbar-hide">
+            <div className="glass-panel w-full bg-[#0A0A0C] border-t border-white/10 p-6 rounded-t-3xl pb-10 max-h-[60vh] overflow-y-auto scrollbar-hide">
               <h3 className="text-lg font-medium text-white mb-4">{t('scan_select_category')}</h3>
               <div className="grid grid-cols-2 gap-2">
                 {CATEGORIES.filter(c => type === 'income' ? (c.name === 'Revenus' || c.name === 'Remboursement' || c.name === 'Autres') : c.name !== 'Revenus').map((cat) => (
@@ -224,9 +216,14 @@ export const Scanner = ({ direction }) => {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="absolute inset-0 z-50 backdrop-blur-2xl bg-black/60 flex flex-col justify-end"
           >
-            <div className="glass-panel w-full bg-obsidian/90 border-t border-white/10 p-6 rounded-t-3xl pb-10">
+            <div className="glass-panel w-full bg-[#0A0A0C] border-t border-white/10 p-6 rounded-t-3xl pb-10">
               <h3 className="text-lg font-medium text-white mb-4">{t('scan_select_account')}</h3>
               <div className="flex flex-col gap-2">
+                {accounts.length === 0 && (
+                  <div className="p-6 text-center text-white/40 text-sm">
+                    {t('dash_no_accounts')}
+                  </div>
+                )}
                 {accounts.map((acc) => (
                   <button
                     key={acc.id}

@@ -21,42 +21,7 @@ const load = (key, fallback = null) => {
 const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 const genId = () => '_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
 
-// ─── Default Demo Data ───
-const DEFAULT_ACCOUNTS = [
-  { id: 'acc_1', name: 'Boursorama', type: 'Compte Courant', balance: 2450.75, shortName: 'B', color: 'from-pink-600 to-rose-500', borderColor: 'border-pink-500/30' },
-  { id: 'acc_2', name: 'Revolut', type: 'Principal', balance: 1240.20, shortName: 'R', color: 'from-blue-600 to-cyan-500', borderColor: 'border-cyan-500/30' },
-  { id: 'acc_3', name: 'Caisse Épargne', type: 'Livret A', balance: 8500.00, shortName: 'CE', color: 'from-red-600 to-orange-500', borderColor: 'border-red-500/30' },
-];
-
-const now = new Date();
-const today = now.toISOString().split('T')[0];
-const yesterday = new Date(now - 86400000).toISOString().split('T')[0];
-const threeDaysAgo = new Date(now - 86400000 * 3).toISOString().split('T')[0];
-const fiveDaysAgo = new Date(now - 86400000 * 5).toISOString().split('T')[0];
-const sixDaysAgo = new Date(now - 86400000 * 6).toISOString().split('T')[0];
-const tenDaysAgo = new Date(now - 86400000 * 10).toISOString().split('T')[0];
-const fifteenDaysAgo = new Date(now - 86400000 * 15).toISOString().split('T')[0];
-const twentyDaysAgo = new Date(now - 86400000 * 20).toISOString().split('T')[0];
-
-const DEFAULT_TRANSACTIONS = [
-  { id: 'tx_1', accountId: 'acc_2', title: 'Netflix', amount: -13.99, date: today, category: 'Loisirs', icon: 'Tv' },
-  { id: 'tx_2', accountId: 'acc_1', title: 'Carrefour Market', amount: -84.50, date: yesterday, category: 'Alimentation', icon: 'ShoppingCart' },
-  { id: 'tx_3', accountId: 'acc_2', title: 'Uber Eats', amount: -22.90, date: yesterday, category: 'Restaurants', icon: 'Coffee' },
-  { id: 'tx_4', accountId: 'acc_3', title: 'Intérêts Livret A', amount: 125.00, date: threeDaysAgo, category: 'Revenus', icon: 'ArrowDownLeft' },
-  { id: 'tx_5', accountId: 'acc_1', title: 'Apple Store', amount: -99.00, date: fiveDaysAgo, category: 'High-Tech', icon: 'MonitorSmartphone' },
-  { id: 'tx_6', accountId: 'acc_2', title: 'Remboursement Spotify', amount: 10.99, date: sixDaysAgo, category: 'Remboursement', icon: 'ArrowDownLeft' },
-  { id: 'tx_7', accountId: 'acc_1', title: 'SNCF TGV', amount: -67.00, date: tenDaysAgo, category: 'Transport', icon: 'Car' },
-  { id: 'tx_8', accountId: 'acc_2', title: 'Amazon', amount: -34.99, date: fifteenDaysAgo, category: 'Shopping', icon: 'ShoppingCart' },
-  { id: 'tx_9', accountId: 'acc_1', title: 'Salaire', amount: 2200.00, date: twentyDaysAgo, category: 'Revenus', icon: 'ArrowDownLeft' },
-  { id: 'tx_10', accountId: 'acc_3', title: 'Loyer', amount: -750.00, date: twentyDaysAgo, category: 'Logement', icon: 'Home' },
-];
-
-const DEFAULT_SUBSCRIPTIONS = [
-  { id: 'sub_1', name: 'Netflix', amount: 13.99, category: 'Loisirs', icon: 'Tv', color: '#E50914', billingDay: 1 },
-  { id: 'sub_2', name: 'Spotify', amount: 10.99, category: 'Loisirs', icon: 'Music', color: '#1DB954', billingDay: 15 },
-  { id: 'sub_3', name: 'iCloud+', amount: 2.99, category: 'High-Tech', icon: 'Cloud', color: '#007AFF', billingDay: 10 },
-];
-
+// ─── Defaults (empty on first launch) ───
 const DEFAULT_PROFILE = {
   name: 'Utilisateur',
   avatarIndex: 3,
@@ -75,9 +40,9 @@ const DEFAULT_SETTINGS = {
 // ─── Initialize on first launch ───
 export function initStore() {
   if (!load(KEYS.initialized)) {
-    save(KEYS.accounts, DEFAULT_ACCOUNTS);
-    save(KEYS.transactions, DEFAULT_TRANSACTIONS);
-    save(KEYS.subscriptions, DEFAULT_SUBSCRIPTIONS);
+    save(KEYS.accounts, []);
+    save(KEYS.transactions, []);
+    save(KEYS.subscriptions, []);
     save(KEYS.profile, DEFAULT_PROFILE);
     save(KEYS.settings, DEFAULT_SETTINGS);
     save(KEYS.initialized, true);
