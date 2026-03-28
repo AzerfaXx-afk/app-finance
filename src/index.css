@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-glass border border-glassBorder rounded-[2.5rem] backdrop-blur-[24px] shadow-2xl;
+  }
+  
+  .glass-button {
+    @apply bg-glass border border-glassBorder rounded-full backdrop-blur-xl shadow-lg transition-all duration-300;
+  }
+  
+  .glass-button:active {
+    @apply scale-95 bg-white/5;
+  }
+
+  .liquid-bg {
+    background: radial-gradient(circle at 10% 20%, rgba(0, 51, 34, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(26, 26, 58, 0.5) 0%, transparent 50%),
+                #0A0A0C;
+    background-size: 200% 200%;
+    animation: flow 20s ease-in-out infinite alternate;
+  }
+  
+  .glow-text {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overscroll-behavior-y: none;
+  background-color: #0A0A0C;
+}
+
+/* Hide scrollbar for seamless mobile feel */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
